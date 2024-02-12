@@ -8,19 +8,28 @@ const userSchema = mongoose.Schema({
   name: String,
   followers: [{
     type: mongoose.Schema.Types.ObjectId,
+    ref: "user"
+  }],
+  followings: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user"
+  }],
+  posts: [{
+    type: mongoose.Schema.Types.ObjectId,
     ref: "post"
   }],
-  following: [{
+  story: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "story"
   }],
-  posts: [],
-  story: [],
-  messages: [],
-  bio: String,
-  email: String,
-  password: String,
+  messages: {
+    type: Array,
+    default: []
+  },
   profilePicture: String,
+  bio: String,
+  password: String,
+  email: String,
 });
  
 userSchema.plugin(plm)

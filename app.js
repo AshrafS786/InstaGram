@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const expressSession = express('expressSession')
+const expressSession = express('express-session')
 const passport = require('passport')
 
 var indexRouter = require('./routes/index');
@@ -22,8 +22,8 @@ app.use(expressSession({
 }))
 app.use(passport.initialize());
 app.use(passport.session());
-
-
+passport.serializeUser(usersRouter.serializeUser());
+passport.deserializeUser(usersRouter.deserializeUser());
 
 app.use(logger('dev'));
 app.use(express.json());
