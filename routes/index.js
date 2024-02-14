@@ -1,7 +1,7 @@
 var express = require("express");
 const passport = require("passport");
 var router = express.Router();
-const userModel = require("user-model");
+const userModel = require("./users");
 const localStrategy = require("passport-local");
 
 passport.use(new localStrategy(userModel.authenticate()));
@@ -18,8 +18,12 @@ router.get("/feed", isLoggedIn, function (req, res) {
   res.render("feed", { footer: true });
 });
 
-router.get("/profile", isLoggedIn, function (req, res) {
-  res.render("profile", { footer: true });
+router.get("/profile", isLoggedIn, async function (req, res) {
+  let user = await userModel.findOne({
+    username: req.session.passport.user,
+  });
+
+  res.render("profile", { footer: true, user });
 });
 
 router.get("/search", isLoggedIn, function (req, res) {
@@ -35,11 +39,10 @@ router.get("/upload", isLoggedIn, function (req, res) {
 });
 
 router.post("/register", (req, res, next) => {
-  const { username, name, email } = req.body;
   var userDets = new userModel({
-    username,
-    name,
-    email,
+    username: req.body.username,
+    name: req.body.name,
+    email: req.body.email,
   });
   userModel.register(userDets, req.body.password).then(function (reg) {
     passport.authenticate("local")(req, res, function () {

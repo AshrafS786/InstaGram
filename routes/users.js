@@ -26,7 +26,10 @@ const userSchema = mongoose.Schema({
     type: Array,
     default: []
   },
-  profilePicture: String,
+  profilepicture: {
+    type: String,
+    default: 'default.jpg'
+  },
   bio: String,
   password: String,
   email: String,
