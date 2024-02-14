@@ -6,6 +6,9 @@ mongoose.connect('mongodb://0.0.0.0/InstaGram')
 const userSchema = mongoose.Schema({
   username: String,
   name: String,
+  bio: String,
+  password: String,
+  email: String,
   followers: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "user"
@@ -30,9 +33,7 @@ const userSchema = mongoose.Schema({
     type: String,
     default: 'default.jpg'
   },
-  bio: String,
-  password: String,
-  email: String,
+  
 });
  
 userSchema.plugin(plm)

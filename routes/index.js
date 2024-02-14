@@ -1,10 +1,25 @@
-var express = require("express");
+var express = require("express")
 const passport = require("passport");
 var router = express.Router();
 const userModel = require("./users");
 const localStrategy = require("passport-local");
+const multer  = require('multer')
+const {v4: uuid} = require('uuid');
+const path = require("path");
 
 passport.use(new localStrategy(userModel.authenticate()));
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './public/images/uploads')
+  },
+  filename: function (req, file, cb) {
+    const fn = uuid()+path.extname(file.originalname) 
+    cb(null, fn)
+  }
+})
+
+const upload = multer({ storage: storage })
 
 router.get("/", function (req, res) {
   res.render("index", { footer: false });
@@ -32,6 +47,13 @@ router.get("/search", isLoggedIn, function (req, res) {
 
 router.get("/edit", isLoggedIn, function (req, res) {
   res.render("edit", { footer: true });
+});
+
+router.post("/upload/profilepic", isLoggedIn, upload.single('image'),async function (req, res) {
+  const user = await userModel.findOne({username: req.session.passport.user})
+  user.profilepicture = req.file.filename;
+  await user.save();
+  res.redirect("/profile");
 });
 
 router.get("/upload", isLoggedIn, function (req, res) {
@@ -65,14 +87,16 @@ router.get("/logout", (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res.redirect("/");
+    res.redirect("/login");
   });
 });
 
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
-  } else res.redirect("/login");
+  } else {
+    res.redirect("/login");
+  }
 }
 
 module.exports = router;
