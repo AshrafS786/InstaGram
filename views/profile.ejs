@@ -33,11 +33,11 @@
       <div class="px-6 mt-5">
         <a class="px-3 py-2 bg-zinc-800 text-xs rounded-md" href="/edit">Edit Profile</a>
       </div>
-      <div class="posts w-full flex justify-between gap-1 py-2 mt-5 flex-wrap">
-        <% if(user.posts.length>0){ %>
+      <div class="posts w-full flex justify-start gap-1 py-2 mt-5 flex-wrap">
+        <% if(user.posts.length > 0){ %>
           <% user.posts.reverse().forEach(function(post){ %>
-            <div class="post w-[32.5%] h-32 bg-sky-100">
-              <img class="w-full h-full object-cover" src="/images/uploads/<%= post.profilepicture %>" alt="">
+            <div class="post w-[32.5%] h-32 bg-sky-100 overflow-hidden">
+              <img class="w-full h-full object-cover" src="/images/uploads/<%= post.image %>" alt="">
             </div>
           <% }) %>
         <% } else { %>

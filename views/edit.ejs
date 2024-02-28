@@ -18,7 +18,9 @@
     <a class="text-sm" href="/feed"><i class="ri-home-line"></i> home</a>
   </div>
   <div class="flex flex-col items-center gap-2 mt-20">
-    <div class="image w-20 h-20 bg-sky-100 rounded-full"></div>
+    <div class="image w-20 h-20 bg-sky-100 rounded-full overflow-hidden">
+      <img class="w-full h-full bg-cover" src="/images/uploads/<%= user.profilepicture %>" alt="">
+    </div>
     <button id="editbtn" class="text-blue-500 capitalize">edit picture</button>
   </div>
   <div class="gap-5 px-4 mt-10">
@@ -29,18 +31,18 @@
         class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900"
         type="text"
         placeholder="username"
-        name="username"
+        name="username" value="<%= user.username %>"
       />
       <input
         class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900"
         type="text"
         placeholder="name"
-        name="name"
+        name="name" value="<%= user.name %>"
       />
       <textarea
-        class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900 resize-none"
-        placeholder="Bio"
-      ></textarea>
+        class="px-3 mt-2 py-2 border-2 border-zinc-800 rounded-md block w-full bg-zinc-900 resize-none" name="bio"
+        placeholder="Bio" 
+      ><%= user.bio %></textarea>
       <input
         class="w-full bg-blue-500 px-3 py-3 rounded-md mt-2"
         type="submit"
