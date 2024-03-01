@@ -4,7 +4,9 @@ var router = express.Router();
 const localStrategy = require("passport-local");
 const userModel = require("./users");
 const postModel = require("./posts");
+const storyModel = require("./story");
 const upload = require("./multer");
+// const utils = require("../utils/utils");
 
 passport.use(new localStrategy(userModel.authenticate()));
 
@@ -16,12 +18,24 @@ router.get("/login", function (req, res) {
   res.render("login", { footer: false });
 });
 
-router.get("/feed", isLoggedIn,async function (req, res) {
+router.get("/feed", isLoggedIn, async function (req, res) {
   const user = await userModel.findOne({ username: req.session.passport.user });
-  const posts = await postModel.find()
-  .populate('user')
+  const posts = await postModel
+  .find()
+  .populate("user");
+  const stories = await storyModel
+  .find({user: {$ne: user._id}})
+  .populate('user');
 
-  res.render("feed", { footer: true, posts, user });
+  var obj = {};
+  const packs = stories.filter(function(story){
+    if(!obj[story.user._id]){
+      obj[story.user._id] = "asdfghj";
+      return true;
+    }
+  })
+
+  res.render("feed", { footer: true, posts, user, stories: packs });
 });
 
 router.get("/profile", isLoggedIn, async function (req, res) {
@@ -29,13 +43,9 @@ router.get("/profile", isLoggedIn, async function (req, res) {
     .findOne({
       username: req.session.passport.user,
     })
-    .populate('posts');
+    .populate("posts");
 
-  res.render("profile", { footer: true, user });
-});
-
-router.get("/search", isLoggedIn, function (req, res) {
-  res.render("search", { footer: true });
+  res.render("profile", { footer: true, user: user });
 });
 
 router.get("/user/:username", isLoggedIn, async function (req, res) {
@@ -51,8 +61,7 @@ router.get("/edit", isLoggedIn, async function (req, res) {
 
 router.get("/save/:postid", isLoggedIn, async function (req, res) {
   const user = await userModel.findOne({ username: req.session.passport.user });
-  // const post = await postModel.findOne({ _id: req.params.postid });
-  user.saved.push(req.params.postid); 
+  user.saved.push(req.params.postid);
   await user.save();
   res.json(user);
 });
@@ -90,19 +99,28 @@ router.post(
   }
 );
 
-router.get("/upload", isLoggedIn, function (req, res) {
-  res.render("upload", { footer: true });
-});
-
-router.get("/like/:postId", isLoggedIn,async function (req, res) {
+router.get("/search", isLoggedIn, async function (req, res) {
   const user = await userModel.findOne({
     username: req.session.passport.user,
   });
-  const post = await postModel.findOne({_id: req.params.postId});
-  if(post.likes.indexOf(user._id) === -1) {
+  res.render("search", { footer: true, user });
+});
+
+router.get("/upload", isLoggedIn, async function (req, res) {
+  const user = await userModel.findOne({
+    username: req.session.passport.user,
+  });
+  res.render("upload", { footer: true, user });
+});
+
+router.get("/like/:postId", isLoggedIn, async function (req, res) {
+  const user = await userModel.findOne({
+    username: req.session.passport.user,
+  });
+  const post = await postModel.findOne({ _id: req.params.postId });
+  if (post.likes.indexOf(user._id) === -1) {
     post.likes.push(user._id);
-  }
-  else {
+  } else {
     post.likes.splice(post.likes.indexOf(user._id), 1);
   }
   await post.save();
@@ -117,13 +135,22 @@ router.post(
     const user = await userModel.findOne({
       username: req.session.passport.user,
     });
-    const post = await postModel.create({
-      caption: req.body.caption,
-      image: req.file.filename,
-      user: user._id,
-    });
 
-    user.posts.push(post._id);
+    if (req.body.type === "post") {
+      const post = await postModel.create({
+        caption: req.body.caption,
+        image: req.file.filename,
+        user: user._id,
+      });
+      user.posts.push(post._id);
+    } 
+    else if (req.body.type === "story") {
+      const story = await storyModel.create({
+        image: req.file.filename,
+        user: user._id,
+      });
+      user.stories.push(story._id);
+    }
     await user.save();
     res.redirect("/feed");
   }

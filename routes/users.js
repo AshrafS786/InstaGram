@@ -6,7 +6,10 @@ mongoose.connect('mongodb://0.0.0.0/InstaGram')
 const userSchema = mongoose.Schema({
   username: String,
   name: String,
-
+  stories: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "story"
+  }],
   followers: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "user"
