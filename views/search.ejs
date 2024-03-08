@@ -28,7 +28,7 @@
 
         response.data.forEach(function (elem) {
           clutter += `
-            <a href="/profile" class="outline-none">
+            <a href="/profile/${elem.username}" class="outline-none">
       <div class="text-white flex items-center gap-2 mt-5">
         <div class="image w-[11vw] h-[11vw] rounded-full bg-sky-100 overflow-hidden">
             <img class="w-full h-full object-cover" src="/images/uploads/${elem.profilepicture}"/>

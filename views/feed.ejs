@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="story px-3 flex gap-3 overflow-auto mt-5">
-    <a href="/story">
+    <a href="/story/0">
       <div class="circle flex-shrink-0">
         <div
           class="gradient w-[18vw] h-[18vw] bg-sky-100 rounded-full bg-gradient-to-r from-purple-700 to-orange-500 flex items-center justify-center"
@@ -24,8 +24,8 @@
       </div>
     </a>
 
-    <% stories.reverse().forEach(function(elem){ %>
-    <a href="/story">
+    <% stories.forEach(function(elem){ %>
+    <a href="/story/<%= elem.user._id %>/0">
       <div class="circle flex-shrink-0">
         <div
           class="gradient w-[18vw] h-[18vw] bg-sky-100 rounded-full bg-gradient-to-r from-purple-700 to-orange-500 flex items-center justify-center"
@@ -55,7 +55,9 @@
           />
         </div>
         <h4 class="text-sm"><%= post.user.username %></h4>
-        <h6 class="text-xs opacity-30">1d</h6>
+        <h6 class="text-xs opacity-30">
+          <%= dater(new Date(post.date)) %>
+        </h6>
       </div>
       <div class="w-full h-96 mt-4 overflow-hidden">
         <img
@@ -107,6 +109,40 @@
 ></script>
 
 <script>
+function formatRelativeTime(date) {
+      const now = new Date();
+      const diff = now - date;
+
+      // Convert milliseconds to seconds
+      const seconds = Math.floor(diff / 1000);
+
+      if (seconds < 60) {
+        return `${seconds}s`;
+      }
+
+      const minutes = Math.floor(seconds / 60);
+
+      if (minutes < 60) {
+        return `${minutes}m`;
+      }
+
+      const hours = Math.floor(minutes / 60);
+
+      if (hours < 24) {
+        return `${hours}h`;
+      }
+
+      const days = Math.floor(hours / 24);
+
+      if (days < 7) {
+        return `${days}d`;
+      }
+
+      const weeks = Math.floor(days / 7);
+
+      return `${weeks}w`;
+    }
+
   function handleLike() {
     document.querySelector(".posts").addEventListener("click", function (e) {
       if (e.target.classList.contains("like")) {
@@ -157,15 +193,26 @@
             icon.classList.remove("ri-heart-3-fill", "text-red-500");
           }
 
-          var like = e.target.parentNode.parentNode.querySelector(".likes");
+          var likes = e.target.parentNode.parentNode.querySelector(".likes");
           likes.textContent = response.data.likes.length + "likes";
         });
 
         gsap.from(icon, {
-          y: 50,
+          scale: 1.5,
+          y: 30,
           opacity: 0,
-          ease: "linear",
-          onComplete: function () {
+          ease: Expo,
+          duration: 0.3,
+        });
+
+        gsap.to(icon, {
+          scale: 0,
+          y: -30,
+          opacity: 0,
+          duration: 0.3,
+          ease: Expo,
+          delay: 0.3,
+          onComplete: () => {
             e.target.parentNode.parentNode.removeChild(icon);
           },
         });
